@@ -67,11 +67,13 @@ try {
     }
 
     Assert-Contains -Text $output -Pattern '\[OS\] System state changed: RUN'
-    Assert-Contains -Text $output -Pattern '\[App_1\]\[Heartbeat=5s\] I am Lib_1'
-    Assert-Contains -Text $output -Pattern '\[App_1\]\[Heartbeat=10s\] I am Lib_1'
-    Assert-Contains -Text $output -Pattern '\[App_2\]\[Heartbeat=10s\] I am Lib_2'
-    Assert-Contains -Text $output -Pattern '\[App_1\]\[Heartbeat=15s\] I am Lib_1'
-    Assert-Contains -Text $output -Pattern '\[App_3\]\[Heartbeat=15s\] I am Lib_3'
+    Assert-Contains -Text $output -Pattern '\[OS\] Task created: App_4_Task'
+    Assert-Contains -Text $output -Pattern '\[OS\] Task created: App_5_Task'
+    Assert-Contains -Text $output -Pattern '\[App_1\]\[Heartbeat=500\] I am Lib_1'
+    Assert-Contains -Text $output -Pattern '\[App_1\]\[Heartbeat=1000\] I am Lib_1'
+    Assert-Contains -Text $output -Pattern '\[App_2\]\[Heartbeat=500\] I am Lib_2'
+    Assert-Contains -Text $output -Pattern '\[App_1\]\[Heartbeat=1500\] I am Lib_1'
+    Assert-Contains -Text $output -Pattern '\[App_3\]\[Heartbeat=300\] I am Lib_3'
     Assert-Contains -Text $output -Pattern '\[OS\] System state changed: STOP'
 
     $stopIndex = $output.LastIndexOf('[OS] System state changed: STOP')
@@ -80,7 +82,7 @@ try {
     }
 
     $afterStop = $output.Substring($stopIndex)
-    if ($afterStop -match '\[(App_1|App_2|App_3)\]\[Heartbeat=') {
+    if ($afterStop -match '\[(App_1|App_2|App_3|App_4|App_5)\]\[Heartbeat=') {
         throw "heartbeat continued after STOP. Output after STOP:`n$afterStop"
     }
 

@@ -16,7 +16,9 @@
                                                    "${workspaceFolder}/L1_RTE_Layer/OS/include",
                                                    "${workspaceFolder}/L2_APP_Layer/App_1/include",
                                                    "${workspaceFolder}/L2_APP_Layer/App_2/include",
-                                                   "${workspaceFolder}/L2_APP_Layer/App_3/include"
+                                                   "${workspaceFolder}/L2_APP_Layer/App_3/include",
+                                                   "${workspaceFolder}/L2_APP_Layer/App_4/include",
+                                                   "${workspaceFolder}/L2_APP_Layer/App_5/include"
                                                ],
                                "defines":  [
                                                "_DEBUG"

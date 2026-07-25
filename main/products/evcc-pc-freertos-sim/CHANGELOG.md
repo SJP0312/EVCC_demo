@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.3.0 - 2026-07-25
+
+- Changed the PC simulation tick configuration to 100Hz for a more realistic Windows user-mode cadence.
+- Changed task scheduling from millisecond sleep periods to tick-based release periods.
+- Added elapsed-time tick compensation so Windows user-mode sleep granularity does not slow App task execution.
+- Configured App1/App2/App3/App4/App5 task periods as 10ms, 20ms, 50ms, 100ms, and 200ms.
+- Added empty App4/App5 APP and RTE interfaces for future expansion.
+- Kept App1/App2/App3 RTE-routed heartbeat behavior, now printing actual task call counts.
+- Kept test C files outside the normal Makefile project source directories.
+
+## v0.2.0 - 2026-07-25
+
+- Added OS abstraction status codes and wait constants.
+- Added static-pool Queue APIs for copied message passing.
+- Added binary and counting Semaphore APIs.
+- Added EventGroup APIs for bit-based task synchronization.
+- Added simulated Interrupt APIs with register, enable, disable, and trigger behavior.
+- Added OS API test that compiles only OS sources.
+- Kept priority as a configuration/migration field without Windows real-time preemption.
+- Preserved existing App1/App2/App3 heartbeat behavior and OS/ASW decoupling.
+
 ## v0.1.0 - 2026-07-25
 
 - Added PC-side FreeRTOS-style task simulation using MinGW-w64 pthread/winpthreads.

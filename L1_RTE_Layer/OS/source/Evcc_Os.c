@@ -1,5 +1,8 @@
 #include "Evcc_Os.h"
 
+#include "Evcc_Os_Cfg.h"
+#include "Evcc_Os_Internal.h"
+
 #include <pthread.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -20,17 +23,30 @@ static EvccOs_TaskControlBlock evcc_os_tasks[EVCC_OS_MAX_TASKS];
 static size_t evcc_os_task_count;
 static pthread_mutex_t evcc_os_state_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t evcc_os_print_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t evcc_os_tick_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t evcc_os_tick_cond = PTHREAD_COND_INITIALIZER;
 static EvccOs_StateType evcc_os_state = EVCC_OS_STATE_STOP;
+static EvccOs_TickType evcc_os_tick_count;
+static pthread_t evcc_os_tick_thread;
 static pthread_t evcc_os_console_thread;
 static int evcc_os_console_created;
 
 static void *EvccOs_TaskThread(void *argument);
+static void *EvccOs_TickThread(void *argument);
 static void *EvccOs_ConsoleCommandThread(void *argument);
+static unsigned long long EvccOs_GetHostTimeMs(void);
 
 void EvccOs_Init(void)
 {
     evcc_os_task_count = 0U;
     evcc_os_console_created = 0;
+    pthread_mutex_lock(&evcc_os_tick_mutex);
+    evcc_os_tick_count = 0U;
+    pthread_mutex_unlock(&evcc_os_tick_mutex);
+    EvccOs_QueueInit();
+    EvccOs_SemaphoreInit();
+    EvccOs_EventGroupInit();
+    EvccOs_InterruptInit();
     EvccOs_SetState(EVCC_OS_STATE_STOP);
 }
 
@@ -39,7 +55,7 @@ int EvccOs_CreateTask(const EvccOs_TaskConfigType *taskConfig)
     pthread_attr_t attr;
     int result;
 
-    if ((taskConfig == NULL) || (taskConfig->taskFunc == NULL) || (taskConfig->periodMs == 0U)) {
+    if ((taskConfig == NULL) || (taskConfig->taskFunc == NULL) || (taskConfig->periodTicks == 0U)) {
         return -1;
     }
 
@@ -79,6 +95,11 @@ void EvccOs_StartScheduler(void)
     int result;
 
     EvccOs_Printf("[OS] Scheduler start. Input command: 1=start/resume, 0=stop/pause\n");
+    result = pthread_create(&evcc_os_tick_thread, NULL, EvccOs_TickThread, NULL);
+    if (result != 0) {
+        EvccOs_Printf("[OS] Tick task create failed: %d\n", result);
+    }
+
     result = pthread_create(&evcc_os_console_thread, NULL, EvccOs_ConsoleCommandThread, NULL);
     if (result == 0) {
         evcc_os_console_created = 1;
@@ -101,11 +122,25 @@ void EvccOs_DelayMs(unsigned int delayMs)
     }
 }
 
+EvccOs_TickType EvccOs_GetTickCount(void)
+{
+    EvccOs_TickType tickCount;
+
+    pthread_mutex_lock(&evcc_os_tick_mutex);
+    tickCount = evcc_os_tick_count;
+    pthread_mutex_unlock(&evcc_os_tick_mutex);
+    return tickCount;
+}
+
 void EvccOs_SetState(EvccOs_StateType state)
 {
     pthread_mutex_lock(&evcc_os_state_mutex);
     evcc_os_state = state;
     pthread_mutex_unlock(&evcc_os_state_mutex);
+
+    pthread_mutex_lock(&evcc_os_tick_mutex);
+    pthread_cond_broadcast(&evcc_os_tick_cond);
+    pthread_mutex_unlock(&evcc_os_tick_mutex);
 }
 
 EvccOs_StateType EvccOs_GetState(void)
@@ -138,15 +173,71 @@ void EvccOs_Printf(const char *format, ...)
 static void *EvccOs_TaskThread(void *argument)
 {
     EvccOs_TaskControlBlock *task = (EvccOs_TaskControlBlock *)argument;
+    EvccOs_TickType nextReleaseTick;
+
+    nextReleaseTick = EvccOs_GetTickCount() + task->config->periodTicks;
 
     while (1) {
-        if (EvccOs_IsRunning()) {
-            task->config->taskFunc();
+        pthread_mutex_lock(&evcc_os_tick_mutex);
+        while (evcc_os_tick_count < nextReleaseTick) {
+            pthread_cond_wait(&evcc_os_tick_cond, &evcc_os_tick_mutex);
         }
-        EvccOs_DelayMs(task->config->periodMs);
+        pthread_mutex_unlock(&evcc_os_tick_mutex);
+
+        if (!EvccOs_IsRunning()) {
+            nextReleaseTick = EvccOs_GetTickCount() + task->config->periodTicks;
+            continue;
+        }
+
+        task->config->taskFunc();
+        nextReleaseTick += task->config->periodTicks;
     }
 
     return NULL;
+}
+
+static void *EvccOs_TickThread(void *argument)
+{
+    EvccOs_TickType elapsedTicks;
+    unsigned long long currentTimeMs;
+    unsigned long long elapsedMs;
+    unsigned long long lastTickTimeMs;
+
+    (void)argument;
+    lastTickTimeMs = EvccOs_GetHostTimeMs();
+
+    while (1) {
+        EvccOs_DelayMs(EVCC_OS_TICK_PERIOD_MS);
+        currentTimeMs = EvccOs_GetHostTimeMs();
+        if (currentTimeMs < lastTickTimeMs) {
+            lastTickTimeMs = currentTimeMs;
+            continue;
+        }
+
+        elapsedMs = currentTimeMs - lastTickTimeMs;
+        elapsedTicks = (EvccOs_TickType)(elapsedMs / EVCC_OS_TICK_PERIOD_MS);
+
+        if (elapsedTicks == 0U) {
+            continue;
+        }
+
+        lastTickTimeMs += ((unsigned long long)elapsedTicks * EVCC_OS_TICK_PERIOD_MS);
+
+        pthread_mutex_lock(&evcc_os_tick_mutex);
+        evcc_os_tick_count += elapsedTicks;
+        pthread_cond_broadcast(&evcc_os_tick_cond);
+        pthread_mutex_unlock(&evcc_os_tick_mutex);
+    }
+
+    return NULL;
+}
+
+static unsigned long long EvccOs_GetHostTimeMs(void)
+{
+    struct timespec currentTime;
+
+    (void)timespec_get(&currentTime, TIME_UTC);
+    return ((unsigned long long)currentTime.tv_sec * 1000ULL) + ((unsigned long long)currentTime.tv_nsec / 1000000ULL);
 }
 
 static void *EvccOs_ConsoleCommandThread(void *argument)
@@ -169,4 +260,3 @@ static void *EvccOs_ConsoleCommandThread(void *argument)
 
     return NULL;
 }
-

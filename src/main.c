@@ -3,11 +3,15 @@
 #include "App_1.h"
 #include "App_2.h"
 #include "App_3.h"
+#include "App_4.h"
+#include "App_5.h"
 #include "Evcc_Os.h"
 #include "Evcc_Os_Cfg.h"
 #include "Rte_App_1.h"
 #include "Rte_App_2.h"
 #include "Rte_App_3.h"
+#include "Rte_App_4.h"
+#include "Rte_App_5.h"
 
 void EVCC_Init(void)
 {
@@ -16,9 +20,13 @@ void EVCC_Init(void)
     Rte_App1_Init();
     Rte_App2_Init();
     Rte_App3_Init();
+    Rte_App4_Init();
+    Rte_App5_Init();
     App1_Init();
     App2_Init();
     App3_Init();
+    App4_Init();
+    App5_Init();
 }
 
 void EVCC_CreateTasks(void)

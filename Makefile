@@ -11,7 +11,9 @@ SOURCE_DIRS := \
 	L1_RTE_Layer/OS/source \
 	L2_APP_Layer/App_1/source \
 	L2_APP_Layer/App_2/source \
-	L2_APP_Layer/App_3/source
+	L2_APP_Layer/App_3/source \
+	L2_APP_Layer/App_4/source \
+	L2_APP_Layer/App_5/source
 
 INCLUDE_DIRS := \
 	$(INC_DIR) \
@@ -22,7 +24,9 @@ INCLUDE_DIRS := \
 	L1_RTE_Layer/OS/include \
 	L2_APP_Layer/App_1/include \
 	L2_APP_Layer/App_2/include \
-	L2_APP_Layer/App_3/include
+	L2_APP_Layer/App_3/include \
+	L2_APP_Layer/App_4/include \
+	L2_APP_Layer/App_5/include
 
 CC := gcc
 CXX := g++

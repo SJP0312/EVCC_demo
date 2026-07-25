@@ -28,9 +28,20 @@ mingw32-make rebuild
 
 ## PC FreeRTOS-Style Simulation
 
-This project uses a pthread-based OS abstraction. On this PC, Windows Device Guard
+This project uses a pthread-based OS abstraction with a 100Hz software tick.
+The tick thread compensates for Windows user-mode sleep granularity by advancing
+the logical tick count from elapsed host time. On this PC, Windows Device Guard
 allows the dynamic `winpthread` build and blocks statically linked `winpthread`
 executables, so the default build is the runnable dynamic pthread mode.
+
+Current OS abstraction capabilities:
+
+- 100Hz OS tick, task creation, periodic task execution, scheduler start, delay, and RUN/STOP control.
+- Static-pool queues for task/ISR-style message passing.
+- Binary and counting semaphores for synchronization.
+- Event groups for multi-condition bit waits.
+- Simulated interrupts with register, enable, disable, and trigger APIs.
+- Task priority fields are retained for configuration and future migration, but this PC pthread backend does not provide FreeRTOS-style hard real-time preemption.
 
 Run the project:
 
@@ -52,11 +63,24 @@ Terminal commands while the program is running:
 0    Stop or pause task execution
 ```
 
+Tick and task period configuration:
+
+```c
+#define EVCC_OS_TICK_RATE_HZ 100U
+#define EVCC_OS_APP1_TASK_PERIOD_MS 10U
+#define EVCC_OS_APP2_TASK_PERIOD_MS 20U
+#define EVCC_OS_APP3_TASK_PERIOD_MS 50U
+#define EVCC_OS_APP4_TASK_PERIOD_MS 100U
+#define EVCC_OS_APP5_TASK_PERIOD_MS 200U
+```
+
 Expected heartbeat behavior:
 
-- `App_1`: 1s task period, prints every 5s with `I am Lib_1`.
-- `App_2`: 1s task period, prints every 10s with `I am Lib_2`.
-- `App_3`: 1s task period, prints every 15s with `I am Lib_3`.
+- `App_1`: 10ms task period, prints every 500 task calls with `I am Lib_1`.
+- `App_2`: 20ms task period, prints every 500 task calls with `I am Lib_2`.
+- `App_3`: 50ms task period, prints every 300 task calls with `I am Lib_3`.
+- `App_4`: 100ms task period, empty interface reserved for later logic.
+- `App_5`: 200ms task period, empty interface reserved for later logic.
 
 This verifies the intended RTE routing:
 
@@ -73,6 +97,10 @@ header directly, and shared generic RTE getters are intentionally not used.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\run_layer_decoupling_check.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\run_evcc_os_tick_config_check.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\run_evcc_os_tick_elapsed_check.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\run_evcc_os_api_check.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\run_evcc_os_boundary_check.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\run_evcc_os_smoke.ps1
 ```
 

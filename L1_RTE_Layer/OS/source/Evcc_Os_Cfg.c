@@ -1,28 +1,45 @@
 #include "Evcc_Os_Cfg.h"
 
+/*ASW HEADER CONFIG*/
 #include "App_1.h"
 #include "App_2.h"
 #include "App_3.h"
+#include "App_4.h"
+#include "App_5.h"
 
 const EvccOs_TaskConfigType EvccOs_TaskConfigTable[] = {
     {
         "App_1_Task",
         App1_MainFunction,
-        EVCC_OS_APP_TASK_PERIOD_MS,
+        EVCC_OS_MS_TO_TICKS(EVCC_OS_APP1_TASK_PERIOD_MS),
         EVCC_OS_DEFAULT_STACK_SIZE,
         2U,
     },
     {
         "App_2_Task",
         App2_MainFunction,
-        EVCC_OS_APP_TASK_PERIOD_MS,
+        EVCC_OS_MS_TO_TICKS(EVCC_OS_APP2_TASK_PERIOD_MS),
         EVCC_OS_DEFAULT_STACK_SIZE,
         2U,
     },
     {
         "App_3_Task",
         App3_MainFunction,
-        EVCC_OS_APP_TASK_PERIOD_MS,
+        EVCC_OS_MS_TO_TICKS(EVCC_OS_APP3_TASK_PERIOD_MS),
+        EVCC_OS_DEFAULT_STACK_SIZE,
+        2U,
+    },
+    {
+        "App_4_Task",
+        App4_MainFunction,
+        EVCC_OS_MS_TO_TICKS(EVCC_OS_APP4_TASK_PERIOD_MS),
+        EVCC_OS_DEFAULT_STACK_SIZE,
+        2U,
+    },
+    {
+        "App_5_Task",
+        App5_MainFunction,
+        EVCC_OS_MS_TO_TICKS(EVCC_OS_APP5_TASK_PERIOD_MS),
         EVCC_OS_DEFAULT_STACK_SIZE,
         2U,
     },
