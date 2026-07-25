@@ -8,7 +8,15 @@
                                "cppStandard":  "c++17",
                                "includePath":  [
                                                    "${workspaceFolder}/include",
-                                                   "${workspaceFolder}/src"
+                                                   "${workspaceFolder}/src",
+                                                   "${workspaceFolder}/L0_BSW_Layer/Lib_1/include",
+                                                   "${workspaceFolder}/L0_BSW_Layer/Lib_2/include",
+                                                   "${workspaceFolder}/L0_BSW_Layer/Lib_3/include",
+                                                   "${workspaceFolder}/L1_RTE_Layer/Interface/include",
+                                                   "${workspaceFolder}/L1_RTE_Layer/OS/include",
+                                                   "${workspaceFolder}/L2_APP_Layer/App_1/include",
+                                                   "${workspaceFolder}/L2_APP_Layer/App_2/include",
+                                                   "${workspaceFolder}/L2_APP_Layer/App_3/include"
                                                ],
                                "defines":  [
                                                "_DEBUG"

@@ -1,8 +1,8 @@
 #ifndef EVCC_DEMO_MAIN_H
 #define EVCC_DEMO_MAIN_H
 
-#define PROJECT_GREETING "hello EVCC world"
-
-const char *evcc_demo_message(void);
+void EVCC_Init(void);
+void EVCC_CreateTasks(void);
+void EVCC_MainStateMachine(void);
 
 #endif
