@@ -1,0 +1,13 @@
+{
+  "C_Cpp.errorSquiggles": "enabled",
+  "C_Cpp.intelliSenseEngine": "default",
+  "files.associations": {
+    "*.h": "c",
+    "*.hpp": "cpp"
+  },
+  "code-runner.executorMap": {
+    "c": "cd $dir && mingw32-make run",
+    "cpp": "cd $dir && mingw32-make run"
+  },
+  "code-runner.runInTerminal": true
+}

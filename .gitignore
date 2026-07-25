@@ -1,0 +1,10 @@
+build/
+*.exe
+*.o
+*.obj
+*.d
+*.ilk
+*.pdb
+*.user
+.vscode/.browse.VC.db*
+.vscode/ipch/
