@@ -2,38 +2,46 @@ PROJECT := EVCC_demo
 BUILD_DIR := build
 SRC_DIR := src
 INC_DIR := include
-SOURCE_DIRS := \
-	$(SRC_DIR) \
-	L0_BSW_Layer/Lib_1/source \
-	L0_BSW_Layer/Lib_2/source \
-	L0_BSW_Layer/Lib_3/source \
-	L1_RTE_Layer/Interface/source \
-	L1_RTE_Layer/OS/source \
+AUTOSAR_COMMON_DIR := L0_BSW_Layer/_Common/Autosar_Common
+APP_SOURCE_ROOTS := \
 	L2_APP_Layer/App_1/source \
 	L2_APP_Layer/App_2/source \
 	L2_APP_Layer/App_3/source \
 	L2_APP_Layer/App_4/source \
 	L2_APP_Layer/App_5/source
 
-INCLUDE_DIRS := \
+SOURCE_ROOTS := \
+	$(SRC_DIR) \
+	L0_BSW_Layer \
+	L1_RTE_Layer \
+	L2_APP_Layer \
+	$(APP_SOURCE_ROOTS)
+
+HEADER_ROOTS := \
+	$(AUTOSAR_COMMON_DIR) \
 	$(INC_DIR) \
-	L0_BSW_Layer/Lib_1/include \
-	L0_BSW_Layer/Lib_2/include \
-	L0_BSW_Layer/Lib_3/include \
-	L1_RTE_Layer/Interface/include \
-	L1_RTE_Layer/OS/include \
-	L2_APP_Layer/App_1/include \
-	L2_APP_Layer/App_2/include \
-	L2_APP_Layer/App_3/include \
-	L2_APP_Layer/App_4/include \
-	L2_APP_Layer/App_5/include
+	L0_BSW_Layer \
+	L1_RTE_Layer \
+	L2_APP_Layer
+
+rwildcard = $(strip $(foreach entry,$(wildcard $1*),$(call rwildcard,$(entry)/,$2) $(filter $(subst *,%,$2),$(entry))))
+
+HEADER_FILES := $(sort \
+	$(foreach root,$(HEADER_ROOTS),$(call rwildcard,$(root)/,*.h)) \
+	$(foreach root,$(HEADER_ROOTS),$(call rwildcard,$(root)/,*.hpp)))
+INCLUDE_DIRS := $(sort $(patsubst %/,%,$(dir $(HEADER_FILES))))
 
 CC := gcc
 CXX := g++
 THREAD_LINK ?= dynamic
+DISABLE_AUTOSAR_MEMMAP ?= 1
 
-C_SOURCES := $(strip $(foreach dir,$(SOURCE_DIRS),$(wildcard $(dir)/*.c)))
-CPP_SOURCES := $(strip $(foreach dir,$(SOURCE_DIRS),$(wildcard $(dir)/*.cpp)))
+EXCLUDED_C_SOURCES := \
+	L0_BSW_Layer/IpBase/_Appl_Rand.c \
+	L0_BSW_Layer/IpBase/_Appl_Time.c
+
+C_SOURCES := $(filter-out $(EXCLUDED_C_SOURCES),$(sort $(foreach root,$(SOURCE_ROOTS),$(call rwildcard,$(root)/,*.c))))
+CPP_SOURCES := $(sort $(foreach root,$(SOURCE_ROOTS),$(call rwildcard,$(root)/,*.cpp)))
 C_OBJECTS := $(addprefix $(BUILD_DIR)/,$(C_SOURCES:.c=.c.o))
 CPP_OBJECTS := $(addprefix $(BUILD_DIR)/,$(CPP_SOURCES:.cpp=.cpp.o))
 OBJECTS := $(C_OBJECTS) $(CPP_OBJECTS)
@@ -41,6 +49,9 @@ TARGET := $(BUILD_DIR)/$(PROJECT).exe
 LINKER := $(if $(CPP_SOURCES),$(CXX),$(CC))
 
 CPPFLAGS := $(addprefix -I,$(INCLUDE_DIRS)) -MMD -MP
+ifeq ($(DISABLE_AUTOSAR_MEMMAP),1)
+CPPFLAGS += -DMICROSAR_DISABLE_MEMMAP
+endif
 CFLAGS := -std=c17 -Wall -Wextra -g -O0 -pthread
 CXXFLAGS := -std=c++17 -Wall -Wextra -g -O0 -pthread
 ifeq ($(THREAD_LINK),static)
@@ -52,9 +63,6 @@ LDLIBS := -pthread
 else
 $(error THREAD_LINK must be dynamic or static)
 endif
-
-vpath %.c $(SOURCE_DIRS)
-vpath %.cpp $(SOURCE_DIRS)
 
 .PHONY: all run clean rebuild print-vars
 
@@ -80,7 +88,8 @@ run: all
 clean:
 	if exist "$(BUILD_DIR)" rmdir /S /Q "$(BUILD_DIR)"
 
-rebuild: clean all
+rebuild: clean
+	$(MAKE) all
 
 print-vars:
 	@echo PROJECT=$(PROJECT)
@@ -89,5 +98,6 @@ print-vars:
 	@echo TARGET=$(TARGET)
 	@echo INCLUDE_DIRS=$(INCLUDE_DIRS)
 	@echo THREAD_LINK=$(THREAD_LINK)
+	@echo DISABLE_AUTOSAR_MEMMAP=$(DISABLE_AUTOSAR_MEMMAP)
 
 -include $(OBJECTS:.o=.d)

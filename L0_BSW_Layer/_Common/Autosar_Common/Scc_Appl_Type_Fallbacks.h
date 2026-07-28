@@ -1,0 +1,51 @@
+#ifndef AUTOSAR_COMMON_SCC_APPL_TYPE_FALLBACKS_H
+#define AUTOSAR_COMMON_SCC_APPL_TYPE_FALLBACKS_H
+
+#include "Std_Types.h"
+#include "Exi_Cfg.h"
+#include "Scc_Cfg.h"
+
+#if !(defined(SCC_ENABLE_ISO15118_20_PNC_CHARGING) && (SCC_ENABLE_ISO15118_20_PNC_CHARGING == STD_ON))
+typedef uint8 Scc_ISO15118_20_SupportedProvidersType;
+#endif
+
+#if !(defined(EXI_ENABLE_ISO_20_AC_10_MESSAGE_SET) && (EXI_ENABLE_ISO_20_AC_10_MESSAGE_SET == STD_ON))
+typedef uint8 Exi_ISO_20_AC_10_AC_CPDReqEnergyTransferModeType;
+typedef uint8 Exi_ISO_20_AC_10_AC_CPDResEnergyTransferModeType;
+typedef uint8 Exi_ISO_20_AC_10_BPT_AC_CPDReqEnergyTransferModeType;
+typedef uint8 Exi_ISO_20_AC_10_BPT_AC_CPDResEnergyTransferModeType;
+typedef uint8 Exi_ISO_20_AC_10_BPT_Dynamic_AC_CLReqControlModeType;
+typedef uint8 Exi_ISO_20_AC_10_BPT_Dynamic_AC_CLResControlModeType;
+typedef uint8 Exi_ISO_20_AC_10_BPT_Scheduled_AC_CLReqControlModeType;
+typedef uint8 Exi_ISO_20_AC_10_BPT_Scheduled_AC_CLResControlModeType;
+typedef uint8 Exi_ISO_20_AC_10_Dynamic_AC_CLReqControlModeType;
+typedef uint8 Exi_ISO_20_AC_10_Dynamic_AC_CLResControlModeType;
+typedef uint8 Exi_ISO_20_AC_10_Scheduled_AC_CLReqControlModeType;
+typedef uint8 Exi_ISO_20_AC_10_Scheduled_AC_CLResControlModeType;
+#endif
+
+#if !(defined(EXI_ENABLE_ISO_20_ACDP_10_MESSAGE_SET) && (EXI_ENABLE_ISO_20_ACDP_10_MESSAGE_SET == STD_ON))
+typedef uint8 Exi_ISO_20_ACDP_10_EVTechnicalStatusType;
+typedef uint8 Exi_ISO_20_ACDP_10_electricalChargingDeviceStatusType;
+typedef uint8 Exi_ISO_20_ACDP_10_isolationStatusType;
+typedef uint8 Exi_ISO_20_ACDP_10_mechanicalChargingDeviceStatusType;
+#endif
+
+#if !(defined(EXI_ENABLE_ISO_20_WPT_10_MESSAGE_SET) && (EXI_ENABLE_ISO_20_WPT_10_MESSAGE_SET == STD_ON))
+typedef uint8 Exi_ISO_20_WPT_10_AlternativeSECCListType;
+typedef uint8 Exi_ISO_20_WPT_10_SchemaType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_AlignmentCheckMethodListType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_DataContainerType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_EVPCChargeDiagnosticsType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_EVPCPowerControlParameterType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_EVResultType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_FinePositioningMethodListType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_LF_DataPackageListType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_LF_SystemSetupDataType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_PairingMethodListType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_PowerClassType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_SPCChargeDiagnosticsType;
+typedef uint8 Exi_ISO_20_WPT_10_WPT_SPCPowerControlParameterType;
+#endif
+
+#endif /* AUTOSAR_COMMON_SCC_APPL_TYPE_FALLBACKS_H */

@@ -9,6 +9,8 @@
                                "includePath":  [
                                                    "${workspaceFolder}/include",
                                                    "${workspaceFolder}/src",
+                                                   "${workspaceFolder}/L0_BSW_Layer/**",
+                                                   "${workspaceFolder}/L1_RTE_Layer/Interface/GenData",
                                                    "${workspaceFolder}/L0_BSW_Layer/Lib_1/include",
                                                    "${workspaceFolder}/L0_BSW_Layer/Lib_2/include",
                                                    "${workspaceFolder}/L0_BSW_Layer/Lib_3/include",
@@ -21,7 +23,8 @@
                                                    "${workspaceFolder}/L2_APP_Layer/App_5/include"
                                                ],
                                "defines":  [
-                                               "_DEBUG"
+                                               "_DEBUG",
+                                               "MICROSAR_DISABLE_MEMMAP"
                                            ]
                            }
                        ],

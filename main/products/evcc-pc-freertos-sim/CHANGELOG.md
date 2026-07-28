@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.4.0 - 2026-07-28
+
+- Imported the Vector EVCC BSW protocol stack and generated interface configuration.
+- Extended the Makefile to discover protocol-stack sources and include directories recursively.
+- Added PC-side AUTOSAR, RTE, SchM, NVRAM, communication, SPI, callback, time, and random adapters.
+- Added the requested AUTOSAR type compatibility definitions and corrected generated include-name mismatches.
+- Disabled AUTOSAR MemMap section and MPU placement processing for the Windows simulation build.
+- Updated VSCode IntelliSense paths and defines for the imported stack.
+- Verified a clean parallel rebuild, OS API checks, boundary checks, tick checks, and layer-decoupling checks.
+- Recorded that Windows enterprise code-integrity policy blocks the unsigned executable at process start.
+
 ## v0.3.0 - 2026-07-25
 
 - Changed the PC simulation tick configuration to 100Hz for a more realistic Windows user-mode cadence.

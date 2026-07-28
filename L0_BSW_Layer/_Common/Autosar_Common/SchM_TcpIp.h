@@ -1,0 +1,6 @@
+#ifndef AUTOSAR_COMMON_SCHM_TCPIP_H
+#define AUTOSAR_COMMON_SCHM_TCPIP_H
+
+#include "SchM_Default.h"
+
+#endif /* AUTOSAR_COMMON_SCHM_TCPIP_H */

@@ -30,9 +30,9 @@ mingw32-make rebuild
 
 This project uses a pthread-based OS abstraction with a 100Hz software tick.
 The tick thread compensates for Windows user-mode sleep granularity by advancing
-the logical tick count from elapsed host time. On this PC, Windows Device Guard
-allows the dynamic `winpthread` build and blocks statically linked `winpthread`
-executables, so the default build is the runnable dynamic pthread mode.
+the logical tick count from elapsed host time. The default build uses dynamic
+`winpthread`. On the current PC, compilation and linking succeed, but Windows
+Application Control blocks the unsigned generated executable at process start.
 
 Current OS abstraction capabilities:
 
@@ -48,6 +48,11 @@ Run the project:
 ```powershell
 mingw32-make run
 ```
+
+If `make run` reports Win32 error `4551`, the executable was rejected by the
+machine's enterprise code-integrity policy. The project must be signed with an
+enterprise-trusted code-signing certificate or allowed by the administrator's
+WDAC policy; this is not a compiler or linker failure.
 
 Optional static `winpthread` build, for machines whose application-control policy
 allows it:
@@ -92,6 +97,22 @@ App_3 -> Rte_App_3 -> Lib_3
 
 Each App has its own RTE interface file. App code must not include any `Lib_x`
 header directly, and shared generic RTE getters are intentionally not used.
+
+## Vector EVCC Stack PC Adaptation
+
+The imported EVCC BSW stack is discovered recursively by the Makefile together
+with its generated RTE configuration. PC-only AUTOSAR and basic-service
+compatibility headers are kept under:
+
+```text
+L0_BSW_Layer/_Common/Autosar_Common/
+```
+
+Target linker sections and MPU placement are disabled for the Windows simulation
+with `MICROSAR_DISABLE_MEMMAP`. The generated module MemMap includes remain in
+the source tree, but become no-ops in the PC build. Set
+`DISABLE_AUTOSAR_MEMMAP=0` only for a target toolchain that supplies the required
+linker-section implementation.
 
 ## Verification
 
